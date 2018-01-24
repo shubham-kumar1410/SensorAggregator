@@ -1,5 +1,7 @@
 package com.bitsg.sensoraggregator;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -10,12 +12,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.WindowManager;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Vector;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class LocationInfo extends AppCompatActivity {
     String location;
     SensorDataAdapter adapter;
+    String json;
+    JSONArray m_jArry;
     private Vector<Sensor> sensors = new Vector<>();
     private RecyclerView recyclerView;
 
@@ -34,8 +42,13 @@ public class LocationInfo extends AppCompatActivity {
                 }
             });
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         }
         location = getIntent().getStringExtra("location");
+        if (location != null) {
+            getSupportActionBar().setTitle(location + " | Sensor List");
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             int colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary);
@@ -46,6 +59,27 @@ public class LocationInfo extends AppCompatActivity {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         recyclerView.setHasFixedSize(true);
+        SharedPreferences sp = getApplicationContext().getSharedPreferences("index_value", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        //  editor.putInt("index", 0);
+        // editor.apply();
+        try {
+            InputStream is = getAssets().open("data.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            JSONObject obj = new JSONObject(json);
+            m_jArry = obj.getJSONArray("sensor");
+            //   Toast.makeText(LocationInfo.this,String.valueOf(m_jArry.length()),Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+
+        }
 
         Thread t = new Thread() {
 
@@ -53,16 +87,25 @@ public class LocationInfo extends AppCompatActivity {
             public void run() {
                 try {
                     while (!isInterrupted()) {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                updateData();
+                                SharedPreferences sp = getSharedPreferences("index_value", Activity.MODE_PRIVATE);
+                                int i = sp.getInt("index", -1);
+                                updateData(i);
                                 adapter = new SensorDataAdapter(LocationInfo.this, sensors);
                                 recyclerView.setAdapter(adapter);
                                 GridLayoutManager layoutManager = new GridLayoutManager(LocationInfo.this, 2);
                                 recyclerView.setLayoutManager(layoutManager);
-
+                                if (i <= 900) {
+                                    i++;
+                                } else {
+                                    i = 0;
+                                }
+                                SharedPreferences.Editor editor = sp.edit();
+                                editor.putInt("index", i);
+                                editor.apply();
                             }
                         });
                     }
@@ -74,43 +117,50 @@ public class LocationInfo extends AppCompatActivity {
         t.start();
     }
 
-    private void updateData() {
+    private void updateData(int i) {
         sensors.clear();
-        Sensor sensor = new Sensor();
-        double random = ThreadLocalRandom.current().nextDouble(3.04, 3.06);
-        sensor.setData(random);
-        sensor.setSensor_name("Sensor 1");
-        sensors.add(sensor);
 
-        Sensor sensor1 = new Sensor();
-        double random1 = ThreadLocalRandom.current().nextDouble(6.54, 6.57);
-        sensor1.setData(random1);
-        sensor1.setSensor_name("Sensor 2");
-        sensors.add(sensor1);
+        try {
+            JSONObject jo_inside = m_jArry.getJSONObject(i);
+            Sensor sensor = new Sensor();
 
-        Sensor sensor2 = new Sensor();
-        double random2 = ThreadLocalRandom.current().nextDouble(0.77, 0.85);
-        sensor2.setData(random2);
-        sensor2.setSensor_name("Sensor 3");
-        sensors.add(sensor2);
+            sensor.setData(jo_inside.getString("S1"));
+            sensor.setSensor_name("Anode pH");
+            sensors.add(sensor);
 
-        Sensor sensor3 = new Sensor();
-        double random3 = ThreadLocalRandom.current().nextDouble(23.945, 23.96);
-        sensor3.setData(random3);
-        sensor3.setSensor_name("Sensor 4");
-        sensors.add(sensor3);
+            Sensor sensor1 = new Sensor();
 
-        Sensor sensor4 = new Sensor();
-        double random4 = ThreadLocalRandom.current().nextDouble(45.18, 46.4);
-        sensor4.setData(random4);
-        sensor4.setSensor_name("Sensor 5");
-        sensors.add(sensor4);
+            sensor1.setData(jo_inside.getString("S2"));
+            sensor1.setSensor_name("Cathode pH");
+            sensors.add(sensor1);
 
-        Sensor sensor5 = new Sensor();
-        double random5 = ThreadLocalRandom.current().nextDouble(38.09, 38.6);
-        sensor5.setData(random5);
-        sensor5.setSensor_name("Sensor 6");
-        sensors.add(sensor5);
+            Sensor sensor2 = new Sensor();
+            sensor2.setData(jo_inside.getString("S3"));
+            sensor2.setSensor_name("Current Reactor");
+            sensors.add(sensor2);
+
+            Sensor sensor3 = new Sensor();
+            sensor3.setData(jo_inside.getString("S4"));
+            sensor3.setSensor_name("Voltage Reactor");
+            sensors.add(sensor3);
+
+            Sensor sensor4 = new Sensor();
+            sensor4.setData(jo_inside.getString("S5"));
+            sensor4.setSensor_name("Temp Anode");
+            sensors.add(sensor4);
+
+            Sensor sensor5 = new Sensor();
+            sensor5.setData(jo_inside.getString("S6"));
+            sensor5.setSensor_name("Temp Cathode");
+            sensors.add(sensor5);
+
+//                Sensor sensor6 = new Sensor();
+//                sensor6.setData(jo_inside.getString("S7"));
+//                sensor6.setSensor_name("Motor Voltage");
+//                sensors.add(sensor6);
+        } catch (Exception e) {
+
+
+        }
     }
-
 }

@@ -5,10 +5,10 @@ package com.bitsg.sensoraggregator;
  */
 
 public class Sensor {
-    double data;
+    String data;
     String sensor_name;
 
-    public Sensor(double data, String sensor_name) {
+    public Sensor(String data, String sensor_name) {
         this.data = data;
         this.sensor_name = sensor_name;
     }
@@ -16,11 +16,11 @@ public class Sensor {
     public Sensor() {
     }
 
-    public double getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(double data) {
+    public void setData(String data) {
         this.data = data;
     }
 
