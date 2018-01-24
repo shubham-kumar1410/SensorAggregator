@@ -6,11 +6,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,6 +33,10 @@ public class LocationInfo extends AppCompatActivity {
     SensorDataAdapter adapter;
     String json;
     JSONArray m_jArry;
+    GraphView graph;
+    int click = 0;
+    CardView default_card, graph_card;
+    String[] name = {"Anode pH", "Cathode pH", "Current Reactor", " Voltage Reactor", "Temp Anode", "Temp Cathode"};
     private Vector<Sensor> sensors = new Vector<>();
     private RecyclerView recyclerView;
 
@@ -33,6 +46,7 @@ public class LocationInfo extends AppCompatActivity {
         setContentView(R.layout.activity_location_info);
         Toolbar toolbar = findViewById(R.id.toolbar);
         recyclerView = findViewById(R.id.content_sensor_rv);
+
         setSupportActionBar(toolbar);
         if (toolbar != null) {
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -80,6 +94,61 @@ public class LocationInfo extends AppCompatActivity {
         } catch (Exception e) {
 
         }
+        default_card = findViewById(R.id.default_card);
+        graph_card = findViewById(R.id.graph_card);
+        graph = findViewById(R.id.sensor_graph);
+        graph_card.setVisibility(View.INVISIBLE);
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this,
+                recyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, final int position) {
+                graph_card.setVisibility(View.VISIBLE);
+                default_card.setVisibility(View.INVISIBLE);
+                graph.removeAllSeries();
+                BarGraphSeries<DataPoint> series = new BarGraphSeries<>();
+
+                for (int k = 0; k < 100; k++) {
+                    try {
+                        JSONObject jo_inside = m_jArry.getJSONObject(k);
+                        String data = jo_inside.getString("S" + String.valueOf(position + 1));
+
+                        DataPoint dataPoint = new DataPoint(k, Float.parseFloat(data));
+                        series.appendData(dataPoint, true, 100);
+                        //      Log.v("Test","yo");
+                    } catch (Exception e) {
+                    }
+                }
+
+
+                graph.addSeries(series);
+                series.setSpacing(5);
+
+                series.setDrawValuesOnTop(true);
+                graph.setTitle(name[position]);
+                graph.getViewport().setScrollable(true); // enables horizontal scrolling
+                graph.getViewport().setScrollableY(true); // enables vertical scrolling
+                graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
+                graph.getViewport().setScalableY(true);
+                graph.getViewport().setMinX(0);
+                graph.getViewport().setMaxX(100);
+                //    graph.getViewport().setMinY(-5.0);
+                //  graph.getViewport().setMaxY(0.0);
+
+//       graph.getViewport().setYAxisBoundsManual(true);
+                graph.getViewport().setXAxisBoundsManual(true);
+                series.setOnDataPointTapListener(new OnDataPointTapListener() {
+                    @Override
+                    public void onTap(Series series, DataPointInterface dataPoint) {
+                        Toast.makeText(getApplicationContext(), "Data: " + dataPoint, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
         Thread t = new Thread() {
 
@@ -162,5 +231,11 @@ public class LocationInfo extends AppCompatActivity {
 
 
         }
+    }
+
+    public interface ClickListener {
+        void onClick(View view, int position);
+
+        void onLongClick(View view, int position);
     }
 }
