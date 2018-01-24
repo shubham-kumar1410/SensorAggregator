@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
@@ -35,8 +36,10 @@ public class LocationInfo extends AppCompatActivity {
     JSONArray m_jArry;
     GraphView graph;
     int click = 0;
-    CardView default_card, graph_card;
+    CardView default_card, graph_card, toi_card, tank_card, bed_card;
     String[] name = {"Anode pH", "Cathode pH", "Current Reactor", " Voltage Reactor", "Temp Anode", "Temp Cathode"};
+    TextView sensor_default, graph_default;
+    TextView default_txt_graph;
     private Vector<Sensor> sensors = new Vector<>();
     private RecyclerView recyclerView;
 
@@ -95,16 +98,68 @@ public class LocationInfo extends AppCompatActivity {
 
         }
         default_card = findViewById(R.id.default_card);
-        graph_card = findViewById(R.id.graph_card);
+        toi_card = findViewById(R.id.toi_card);
+        tank_card = findViewById(R.id.tank_card);
+        bed_card = findViewById(R.id.bed_card);
         graph = findViewById(R.id.sensor_graph);
-        graph_card.setVisibility(View.INVISIBLE);
+        sensor_default = findViewById(R.id.sensor_text_def);
+        graph_default = findViewById(R.id.graph_text_def);
+        default_txt_graph = findViewById(R.id.graph_default_text);
+
+
+        recyclerView.setVisibility(View.GONE);
+        graph.setVisibility(View.GONE);
+        default_txt_graph.setVisibility(View.GONE);
+
+        toi_card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.GONE);
+                graph.setVisibility(View.GONE);
+                graph_default.setVisibility(View.VISIBLE);
+                sensor_default.setVisibility(View.VISIBLE);
+                default_txt_graph.setVisibility(View.GONE);
+                toi_card.setCardBackgroundColor(getResources().getColor(R.color.card_select));
+                tank_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+                bed_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+            }
+        });
+
+        tank_card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.VISIBLE);
+                default_txt_graph.setVisibility(View.VISIBLE);
+                sensor_default.setVisibility(View.GONE);
+                graph_default.setVisibility(View.GONE);
+                toi_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+                tank_card.setCardBackgroundColor(getResources().getColor(R.color.card_select));
+                bed_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+            }
+        });
+
+        bed_card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.GONE);
+                graph.setVisibility(View.GONE);
+                graph_default.setVisibility(View.VISIBLE);
+                default_txt_graph.setVisibility(View.GONE);
+                sensor_default.setVisibility(View.VISIBLE);
+                toi_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+                tank_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+                bed_card.setCardBackgroundColor(getResources().getColor(R.color.card_select));
+            }
+        });
+
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this,
                 recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                graph_card.setVisibility(View.VISIBLE);
-                default_card.setVisibility(View.INVISIBLE);
+                default_txt_graph.setVisibility(View.GONE);
+                graph.setVisibility(View.VISIBLE);
                 graph.removeAllSeries();
+
                 BarGraphSeries<DataPoint> series = new BarGraphSeries<>();
 
                 for (int k = 0; k < 100; k++) {

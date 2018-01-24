@@ -37,5 +37,6 @@
     <color name="yellowA400">#FFEA00</color>
     <color name="brownA900">#3e2723</color>
 
-
+    <color name="card_select">#476799</color>
+    <color name="card_normal">#acc6ef</color>
 </resources>
