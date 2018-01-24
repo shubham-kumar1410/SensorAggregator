@@ -1,8 +1,70 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:map="http://schemas.android.com/apk/res-auto"
           xmlns:tools="http://schemas.android.com/tools"
           android:id="@+id/map"
           android:name="com.google.android.gms.maps.SupportMapFragment"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          tools:context="com.bitsg.sensoraggregator.MainActivity"/>
+          tools:context="com.bitsg.sensoraggregator.MainActivity">
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="bottom">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/info_card"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:id="@+id/active_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/green800"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Active : 1"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/info_card_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:id="@+id/inactive_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/red500"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Active : 1"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+</fragment>
