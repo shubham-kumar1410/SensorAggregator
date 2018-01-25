@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.bitsg.sensoraggregator.LocationInfo"
     tools:showIn="@layout/activity_location_info">
@@ -31,7 +32,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="#acc6ef"
+                    app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="15dp">
 
                     <TextView
@@ -52,7 +53,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="#acc6ef"
+                    app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="10dp">
 
                     <TextView
@@ -73,7 +74,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="#acc6ef"
+                    app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="10dp">
 
                     <TextView
@@ -83,7 +84,7 @@
                         android:padding="8dp"
                         android:text="Wet Field"
                         android:textColor="@color/black"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
                 </android.support.v7.widget.CardView>
 
             </LinearLayout>
@@ -97,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/sections"
                 android:layout_marginTop="5dp"
-                app:cardBackgroundColor="#acc6ef"
+                app:cardBackgroundColor="@color/white"
                 >
 
                 <RelativeLayout
@@ -105,39 +106,20 @@
                     android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/sensor_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Sensor List"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
-
-                    <View
-                        android:id="@+id/sensor_divider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_below="@+id/sensor_text"
-                        android:background="@android:color/white"/>
-
-                    <TextView
                         android:id="@+id/sensor_text_def"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/sensor_divider"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="No Sensor Data Available."
                         android:textColor="@color/black"
-                        android:textSize="15sp"/>
+                        android:textSize="15sp"
+                        android:textStyle="bold|italic"/>
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/content_sensor_rv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/sensor_divider"
                         android:layout_margin="1dp"
                         android:scrollbars="vertical"/>
 
@@ -154,58 +136,41 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/sensor_card"
                 android:layout_marginTop="5dp"
-                app:cardBackgroundColor="#acc6ef">
+                app:cardBackgroundColor="@color/white">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/graph_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Graph"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
-
-                    <View
-                        android:id="@+id/graph_divider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_below="@+id/graph_text"
-                        android:background="@android:color/white"/>
 
                     <TextView
                         android:id="@+id/graph_text_def"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/graph_divider"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="No Graph Available."
                         android:textColor="@color/black"
-                        android:textSize="15sp"/>
+                        android:textSize="15sp"
+                        android:textStyle="bold|italic"/>
 
                     <com.jjoe64.graphview.GraphView
                         android:id="@+id/sensor_graph"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
-                        android:layout_below="@+id/graph_divider"
+
                         android:layout_marginTop="2dp"/>
 
                     <TextView
                         android:id="@+id/graph_default_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/graph_divider"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="Kindly Click on Sensor to view its graph."
                         android:textColor="@color/black"
-                        android:textSize="15sp"/>
+                        android:textSize="15sp"
+                        android:textStyle="bold|italic"/>
 
                 </RelativeLayout>
     </android.support.v7.widget.CardView>
@@ -218,7 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/default_card"
                 android:layout_marginTop="5dp"
-                app:cardBackgroundColor="#acc6ef">
+                app:cardBackgroundColor="@color/white">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -240,7 +205,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_below="@+id/diagram_text"
-                        android:background="@android:color/white"/>
+                        android:background="@android:color/black"/>
 
                     <ImageView
                         android:layout_width="match_parent"

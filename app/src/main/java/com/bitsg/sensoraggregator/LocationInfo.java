@@ -110,12 +110,21 @@ public class LocationInfo extends AppCompatActivity {
         recyclerView.setVisibility(View.GONE);
         graph.setVisibility(View.GONE);
         default_txt_graph.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        default_card.setVisibility(View.GONE);
+        graph_default.setVisibility(View.VISIBLE);
+        sensor_default.setVisibility(View.VISIBLE);
+        default_txt_graph.setVisibility(View.GONE);
+        toi_card.setCardBackgroundColor(getResources().getColor(R.color.card_select));
+        tank_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+        bed_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
+
 
         toi_card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 recyclerView.setVisibility(View.GONE);
-                graph.setVisibility(View.GONE);
+                default_card.setVisibility(View.GONE);
                 graph_default.setVisibility(View.VISIBLE);
                 sensor_default.setVisibility(View.VISIBLE);
                 default_txt_graph.setVisibility(View.GONE);
@@ -131,7 +140,9 @@ public class LocationInfo extends AppCompatActivity {
                 recyclerView.setVisibility(View.VISIBLE);
                 default_txt_graph.setVisibility(View.VISIBLE);
                 sensor_default.setVisibility(View.GONE);
+                default_card.setVisibility(View.VISIBLE);
                 graph_default.setVisibility(View.GONE);
+                graph.setVisibility(View.GONE);
                 toi_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
                 tank_card.setCardBackgroundColor(getResources().getColor(R.color.card_select));
                 bed_card.setCardBackgroundColor(getResources().getColor(R.color.card_normal));
@@ -142,7 +153,7 @@ public class LocationInfo extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 recyclerView.setVisibility(View.GONE);
-                graph.setVisibility(View.GONE);
+                default_card.setVisibility(View.GONE);
                 graph_default.setVisibility(View.VISIBLE);
                 default_txt_graph.setVisibility(View.GONE);
                 sensor_default.setVisibility(View.VISIBLE);
@@ -161,19 +172,33 @@ public class LocationInfo extends AppCompatActivity {
                 graph.removeAllSeries();
 
                 BarGraphSeries<DataPoint> series = new BarGraphSeries<>();
+                SharedPreferences sp = getSharedPreferences("index_value", Activity.MODE_PRIVATE);
+                int i = sp.getInt("index", -1);
+                if (i > 100) {
+                    for (int k = i - 100; k < i; k++) {
+                        try {
+                            JSONObject jo_inside = m_jArry.getJSONObject(k);
+                            String data = jo_inside.getString("S" + String.valueOf(position + 1));
 
-                for (int k = 0; k < 100; k++) {
-                    try {
-                        JSONObject jo_inside = m_jArry.getJSONObject(k);
-                        String data = jo_inside.getString("S" + String.valueOf(position + 1));
+                            DataPoint dataPoint = new DataPoint(100 - i + k, Float.parseFloat(data));
+                            series.appendData(dataPoint, true, 100);
+                            //      Log.v("Test","yo");
+                        } catch (Exception e) {
+                        }
+                    }
+                } else {
+                    for (int k = 0; k < i; k++) {
+                        try {
+                            JSONObject jo_inside = m_jArry.getJSONObject(k);
+                            String data = jo_inside.getString("S" + String.valueOf(position + 1));
 
-                        DataPoint dataPoint = new DataPoint(k, Float.parseFloat(data));
-                        series.appendData(dataPoint, true, 100);
-                        //      Log.v("Test","yo");
-                    } catch (Exception e) {
+                            DataPoint dataPoint = new DataPoint(k, Float.parseFloat(data));
+                            series.appendData(dataPoint, true, 100);
+                            //      Log.v("Test","yo");
+                        } catch (Exception e) {
+                        }
                     }
                 }
-
 
                 graph.addSeries(series);
                 series.setSpacing(5);
@@ -186,6 +211,7 @@ public class LocationInfo extends AppCompatActivity {
                 graph.getViewport().setScalableY(true);
                 graph.getViewport().setMinX(0);
                 graph.getViewport().setMaxX(100);
+                graph.setTitleTextSize(50);
                 //    graph.getViewport().setMinY(-5.0);
                 //  graph.getViewport().setMaxY(0.0);
 

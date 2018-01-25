@@ -32,7 +32,7 @@
                     android:id="@+id/active_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/green800"
+                    android:background="@color/map_active"
                     android:gravity="center"
                     android:padding="8dp"
                     android:text="Active : 1"
