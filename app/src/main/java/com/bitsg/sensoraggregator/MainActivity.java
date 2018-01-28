@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onMarkerClick(final Marker marker) {
         if (marker.getTitle().equals("Bits Goa")) {
-            Intent intent = new Intent(this, LocationInfo.class);
+            Intent intent = new Intent(this, SensorData.class);
             intent.putExtra("location", marker.getTitle());
             startActivity(intent);
         } else {

@@ -31,8 +31,17 @@
 
         <activity
             android:name=".MainActivity"
+            android:label="Sensor Aggregator">
+        </activity>
+        <activity
+            android:name=".LocationInfo"
+            android:label="@string/title_activity_location_info"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".SplashScreen"
             android:label="Sensor Aggregator"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -40,8 +49,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LocationInfo"
-            android:label="@string/title_activity_location_info"
+            android:name=".SensorData"
+            android:label="@string/title_activity_sensor_data"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
