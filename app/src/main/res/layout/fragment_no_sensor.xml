@@ -61,16 +61,43 @@
                     android:layout_below="@+id/fragment_1_diagram_text"
                     android:background="@android:color/black"/>
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:layout_below="@+id/fragment_1_diagram_divider"
+                    android:layout_marginTop="2dp">
                 <ImageView
                     android:id="@+id/fragment_1_diagram"
                     android:layout_width="match_parent"
                     android:layout_height="350dp"
-                    android:layout_below="@+id/fragment_1_diagram_divider"
-                    android:layout_marginTop="2dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/diagram"
                     />
+
+                    <LinearLayout
+                        android:id="@+id/fragment_1_toilet_click"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal">
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/fragment_1_septic_click"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:layout_below="@id/fragment_1_toilet_click"
+                        android:orientation="horizontal">
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/fragment_1_wet_click"
+                        android:layout_width="match_parent"
+                        android:layout_height="90dp"
+                        android:layout_below="@id/fragment_1_septic_click"
+                        android:orientation="horizontal">
+                    </LinearLayout>
+                </RelativeLayout>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
     </RelativeLayout>

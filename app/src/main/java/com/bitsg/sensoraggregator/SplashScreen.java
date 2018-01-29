@@ -6,14 +6,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SplashScreen extends AppCompatActivity {
 
     ImageView splashimage;
+    Button enter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,17 +30,25 @@ public class SplashScreen extends AppCompatActivity {
             decorView.setSystemUiVisibility(uiOptions);
 
         }
-        new Timer().schedule(new TimerTask() {
-
+//        new Timer().schedule(new TimerTask() {
+//
+//            @Override
+//            public void run() {
+//
+//                // Do not wait so that user doesn't realise this is a new launch.
+//                startActivity(new Intent(SplashScreen.this, MainActivity.class));
+//                finish();
+//
+//            }
+//        }, 1200);
+        enter = findViewById(R.id.enter);
+        enter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-
-                // Do not wait so that user doesn't realise this is a new launch.
+            public void onClick(View view) {
                 startActivity(new Intent(SplashScreen.this, MainActivity.class));
                 finish();
-
             }
-        }, 1200);
+        });
 
     }
 

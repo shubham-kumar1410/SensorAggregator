@@ -3,6 +3,7 @@ package com.bitsg.sensoraggregator;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,8 @@ public class SensorFragment extends Fragment {
     CardView diagram;
     String[] name = {"Anode pH", "Cathode pH", "Current Reactor", " Voltage Reactor", "Temp Anode", "Temp Cathode"};
     TextView default_txt_graph;
+    LinearLayout toilet, septic, wet;
+    TabLayout tabLayout;
     private Vector<Sensor> sensors = new Vector<>();
     private RecyclerView recyclerView;
 
@@ -52,6 +56,35 @@ public class SensorFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_sensor, container, false);
         recyclerView = view.findViewById(R.id.fragment_sensor_rv);
+        toilet = view.findViewById(R.id.fragment_toilet_click);
+        septic = view.findViewById(R.id.fragment_septic_click);
+        wet = view.findViewById(R.id.fragment_wet_click);
+        tabLayout = getActivity().findViewById(R.id.tabs);
+
+        toilet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tabLayout != null) {
+                    tabLayout.getTabAt(0).select();
+                }
+            }
+        });
+        septic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tabLayout != null) {
+                    tabLayout.getTabAt(1).select();
+                }
+            }
+        });
+        wet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tabLayout != null) {
+                    tabLayout.getTabAt(2).select();
+                }
+            }
+        });
         recyclerView.setHasFixedSize(true);
         SharedPreferences sp = getActivity().getApplicationContext().getSharedPreferences("index_value", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
