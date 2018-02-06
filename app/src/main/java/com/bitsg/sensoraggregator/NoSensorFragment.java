@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class NoSensorFragment extends Fragment {
+    final String url = "http://122.166.217.37:1880/find/bits-wastewatermanagement/sensor%20data/";
     ImageView diagram;
     LinearLayout toilet, septic, wet;
     TabLayout tabLayout;
-
     public NoSensorFragment() {
         // Required empty public constructor
     }

@@ -76,7 +76,7 @@ public class SensorData extends AppCompatActivity {
 
         adapter.addFragment(new NoSensorFragment(), "Toilet");
         adapter.addFragment(new SensorFragment(), "Septic Tank");
-        adapter.addFragment(new NoSensorFragment(), "Wet Field");
+        adapter.addFragment(new NoSensorFragment(), "Wet Land");
         viewPager.setAdapter(adapter);
     }
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sensor Aggregator</string>
+    <string name="app_name">RTC</string>
     <string name="title_activity_main">Map</string>
     <string name="title_activity_location_info">Location Info</string>
     <string name="sensor_graph"> <u>See Graph</u></string>
