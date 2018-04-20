@@ -3,7 +3,7 @@ package com.bitsg.sensoraggregator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.View;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +20,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     GoogleMap mMap;
     TextView active, inactive;
-    LatLng bits, station_1;
+    LatLng bits, latLng;
+    int inactive_number, active_number;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,8 +33,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         active = findViewById(R.id.active_text);
         inactive = findViewById(R.id.inactive_text);
-        active.setText("Active Stations : 1");
-        inactive.setText("Inactive Stations : 1");
+
+        inactive_number = 0;
+        active_number = 0;
+
     }
 
 
@@ -40,38 +44,54 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        // Add a marker in Sydney and move the camera
-        station_1 = new LatLng(23.831713, 77.913052);
-        bits = new LatLng(15.391377, 73.879138);
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(1));
 
-        mMap.addMarker(new MarkerOptions().position(station_1).title("Station 2"));
-        mMap.addMarker(new MarkerOptions().position(bits).title("Bits Goa").icon(BitmapDescriptorFactory.defaultMarker(150)));
+        bits = new LatLng(15.391377, 73.879138);
+        for (int i = 0; i < SplashScreen.stations.size(); i++) {
+            boolean check = SplashScreen.stations.get(i).getStatus();
+            if (check) {
+                active_number++;
+                Log.v("tag", "df");
+            } else {
+                inactive_number++;
+            }
+        }
+        active.setText("Active Stations :" + String.valueOf(active_number));
+        inactive.setText("Inactive Stations :" + String.valueOf(inactive_number));
+
+        for (int i = 0; i < SplashScreen.stations.size(); i++) {
+            latLng = new LatLng(SplashScreen.stations.get(i).getLatitude(), SplashScreen.stations.get(i).getLongitude());
+            String name = SplashScreen.stations.get(i).getName();
+            boolean check = SplashScreen.stations.get(i).getStatus();
+            if (check) {
+                mMap.addMarker(new MarkerOptions().position(latLng).title(name).icon(BitmapDescriptorFactory.defaultMarker(150)));
+            } else {
+                mMap.addMarker(new MarkerOptions().position(latLng).title(name));
+            }
+        }
+
+        mMap.animateCamera(CameraUpdateFactory.zoomBy(1));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(bits));
         mMap.setOnMarkerClickListener(MainActivity.this);
-        active.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(bits));
-            }
-        });
-        inactive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(station_1));
-            }
-        });
-
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        if (marker.getTitle().equals("Bits Goa")) {
-            Intent intent = new Intent(this, SensorData.class);
-            intent.putExtra("location", marker.getTitle());
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "Station is not Active", Toast.LENGTH_SHORT).show();
+        String title = marker.getTitle();
+        for (int i = 0; i < SplashScreen.stations.size(); i++) {
+
+            String name = SplashScreen.stations.get(i).getName();
+            boolean check = SplashScreen.stations.get(i).getStatus();
+            if (name.equals(title)) {
+                if (check) {
+                    Intent intent = new Intent(this, SensorDataActive.class);
+                    intent.putExtra("name", name);
+                    intent.putExtra("id", i);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Station is not Active", Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }
         return false;
     }

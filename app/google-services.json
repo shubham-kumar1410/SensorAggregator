@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "766342909302",
+    "firebase_url": "https://sensoraggregator.firebaseio.com",
+    "project_id": "sensoraggregator",
+    "storage_bucket": "sensoraggregator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766342909302:android:fd887b3c467934bf",
+        "android_client_info": {
+          "package_name": "com.bitsg.sensoraggregator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766342909302-f2fg4qsetgse7qokqiaspkajmul0bqik.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bitsg.sensoraggregator",
+            "certificate_hash": "4b6e4744d6b6e05f018fbebf1bdd53f40f0ecc6b"
+          }
+        },
+        {
+          "client_id": "766342909302-brunj1fktf32nkcdlf7ffrq67684p3fg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7hbeuK3tVx9cFAdsra0fUuAsezKHpukE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766342909302-brunj1fktf32nkcdlf7ffrq67684p3fg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

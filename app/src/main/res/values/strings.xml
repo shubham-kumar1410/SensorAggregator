@@ -15,4 +15,7 @@
     <string name="splash_1">Developed by : BITS Pilani KK Birla Goa Campus in association with Cranfield University, UK </string>
     <string name="splash_2">Supported by : Bill and Melinda Gates Foundation </string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_sensor_data_active">SensorDataActive</string>
+    <string name="title_activity_edit_sensor_details">EditSensorDetails</string>
+    <string name="title_activity_graph">GraphActivity</string>
 </resources>

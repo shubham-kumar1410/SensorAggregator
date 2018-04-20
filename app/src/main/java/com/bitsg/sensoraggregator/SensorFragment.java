@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitsg.sensoraggregator.ItemFormats.Sensor;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -59,32 +60,32 @@ public class SensorFragment extends Fragment {
         toilet = view.findViewById(R.id.fragment_toilet_click);
         septic = view.findViewById(R.id.fragment_septic_click);
         wet = view.findViewById(R.id.fragment_wet_click);
-        tabLayout = getActivity().findViewById(R.id.tabs);
+        //tabLayout = getActivity().findViewById(R.id.tabs);
 
-        toilet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tabLayout != null) {
-                    tabLayout.getTabAt(0).select();
-                }
-            }
-        });
-        septic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tabLayout != null) {
-                    tabLayout.getTabAt(1).select();
-                }
-            }
-        });
-        wet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tabLayout != null) {
-                    tabLayout.getTabAt(2).select();
-                }
-            }
-        });
+//        toilet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (tabLayout != null) {
+//                    tabLayout.getTabAt(0).select();
+//                }
+//            }
+//        });
+//        septic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (tabLayout != null) {
+//                    tabLayout.getTabAt(1).select();
+//                }
+//            }
+//        });
+//        wet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (tabLayout != null) {
+//                    tabLayout.getTabAt(2).select();
+//                }
+//            }
+//        });
         recyclerView.setHasFixedSize(true);
         SharedPreferences sp = getActivity().getApplicationContext().getSharedPreferences("index_value", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -114,7 +115,7 @@ public class SensorFragment extends Fragment {
         graph.setVisibility(View.GONE);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(),
-                recyclerView, new LocationInfo.ClickListener() {
+                recyclerView, new SensorDataActive.ClickListener() {
             @Override
             public void onClick(View view, final int position) {
                 default_txt_graph.setVisibility(View.GONE);
@@ -189,10 +190,7 @@ public class SensorFragment extends Fragment {
                                         graph.getViewport().setMinX(0);
                                         graph.getViewport().setMaxX(100);
                                         graph.setTitleTextSize(50);
-                                        //    graph.getViewport().setMinY(-5.0);
-                                        //  graph.getViewport().setMaxY(0.0);
 
-//       graph.getViewport().setYAxisBoundsManual(true);
                                         graph.getViewport().setXAxisBoundsManual(true);
                                         series.setOnDataPointTapListener(new OnDataPointTapListener() {
                                             @Override

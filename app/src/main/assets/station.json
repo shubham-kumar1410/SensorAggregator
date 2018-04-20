@@ -1,0 +1,12 @@
+{
+  "Station": [
+    {
+      "domain": "http://localhost:5000/",
+      "elevation": 75,
+      "longitude": 73.879138,
+      "latitude": 15.391377,
+      "name": "BITS Pilani, Goa Campus",
+      "status": true
+    }
+  ]
+}

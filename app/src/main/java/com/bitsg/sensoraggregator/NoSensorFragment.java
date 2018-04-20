@@ -27,32 +27,32 @@ public class NoSensorFragment extends Fragment {
         toilet = view.findViewById(R.id.fragment_1_toilet_click);
         septic = view.findViewById(R.id.fragment_1_septic_click);
         wet = view.findViewById(R.id.fragment_1_wet_click);
-        tabLayout = getActivity().findViewById(R.id.tabs);
-
-        toilet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tabLayout != null) {
-                    tabLayout.getTabAt(0).select();
-                }
-            }
-        });
-        septic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tabLayout != null) {
-                    tabLayout.getTabAt(1).select();
-                }
-            }
-        });
-        wet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tabLayout != null) {
-                    tabLayout.getTabAt(2).select();
-                }
-            }
-        });
+//        tabLayout = getActivity().findViewById(R.id.tabs);
+//
+//        toilet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (tabLayout != null) {
+//                    tabLayout.getTabAt(0).select();
+//                }
+//            }
+//        });
+//        septic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (tabLayout != null) {
+//                    tabLayout.getTabAt(1).select();
+//                }
+//            }
+//        });
+//        wet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (tabLayout != null) {
+//                    tabLayout.getTabAt(2).select();
+//                }
+//            }
+//        });
         return view;
     }
 
