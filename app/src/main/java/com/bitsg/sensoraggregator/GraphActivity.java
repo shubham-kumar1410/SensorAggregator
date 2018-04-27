@@ -1,16 +1,21 @@
 package com.bitsg.sensoraggregator;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.bitsg.sensoraggregator.ItemFormats.LogData;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -19,17 +24,18 @@ import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Vector;
 
 public class GraphActivity extends AppCompatActivity {
     int index;
     GraphView graph;
     String json;
     JSONArray m_jArry;
-
+    String sensor_key;
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("log");
+    Vector<LogData> logData = new Vector<>();
+    Vector<String> key = new Vector<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,28 +63,9 @@ public class GraphActivity extends AppCompatActivity {
         }
         graph = findViewById(R.id.sensor_graph_activity);
         index = getIntent().getIntExtra("id", -1);
-
+        sensor_key = getIntent().getStringExtra("key");
         if (index >= 0) {
             getSupportActionBar().setTitle(SplashScreen.sensorDetails.get(index).getName());
-        }
-
-        SharedPreferences sp = getApplicationContext().getSharedPreferences("index_value", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        try {
-            InputStream is = getAssets().open("data.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        try {
-            JSONObject obj = new JSONObject(json);
-            m_jArry = obj.getJSONArray("data");
-        } catch (Exception e) {
-
         }
 
         Thread t = new Thread() {
@@ -91,36 +78,34 @@ public class GraphActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                SharedPreferences sp = getSharedPreferences("index_value", Activity.MODE_PRIVATE);
-                                int i = sp.getInt("index", -1);
+
 
 
                                 graph.removeAllSeries();
 
                                 BarGraphSeries<DataPoint> series = new BarGraphSeries<>();
-                                if (i > 100) {
-                                    for (int k = i - 100; k < i; k++) {
-                                        try {
-                                            JSONObject jo_inside = m_jArry.getJSONObject(k);
-                                            String data = jo_inside.getString("sensor" + String.valueOf(index + 1));
+                                databaseReference.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                            DataPoint dataPoint = new DataPoint(100 - i + k, Float.parseFloat(data));
-                                            series.appendData(dataPoint, true, 100);
-                                            //      Log.v("Test","yo");
-                                        } catch (Exception e) {
+                                        logData.clear();
+                                        key.clear();
+                                        for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                                            logData.add(shot.getValue(LogData.class));
+                                            key.add(shot.getKey());
                                         }
                                     }
-                                } else {
-                                    for (int k = 0; k < i; k++) {
-                                        try {
-                                            JSONObject jo_inside = m_jArry.getJSONObject(k);
-                                            String data = jo_inside.getString("sensor" + String.valueOf(index + 1));
 
-                                            DataPoint dataPoint = new DataPoint(k, Float.parseFloat(data));
-                                            series.appendData(dataPoint, true, 100);
-                                            //      Log.v("Test","yo");
-                                        } catch (Exception e) {
-                                        }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                        Log.e("TAG", databaseError.getDetails());
+                                    }
+                                });
+                                for (int k = 0; k < logData.size(); k++) {
+                                    if (logData.get(k).getSensorID().equals(sensor_key)) {
+                                        DataPoint dataPoint = new DataPoint(k, Float.parseFloat(logData.get(k).getData()));
+                                        series.appendData(dataPoint, true, 100);
                                     }
                                 }
 
@@ -145,14 +130,6 @@ public class GraphActivity extends AppCompatActivity {
                                     }
                                 });
 
-                                if (i <= 900) {
-                                    i++;
-                                } else {
-                                    i = 0;
-                                }
-                                SharedPreferences.Editor editor = sp.edit();
-                                editor.putInt("index", i);
-                                editor.apply();
                             }
                         });
                     }

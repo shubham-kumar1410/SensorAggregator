@@ -1,15 +1,21 @@
 package com.bitsg.sensoraggregator;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bitsg.sensoraggregator.ItemFormats.SensorDetails;
 import com.bitsg.sensoraggregator.ItemFormats.Station;
@@ -52,50 +58,74 @@ public class SplashScreen extends AppCompatActivity {
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd = new ProgressDialog(SplashScreen.this);
-                pd.setMessage("Loading...");
-                pd.show();
-                databaseReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!isNetworkAvailable(getApplicationContext())) {
 
-                        stations.clear();
-                        for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                            stations.add(shot.getValue(Station.class));
+                    Snackbar snack = Snackbar.make(enter, "No Internet.", Snackbar.LENGTH_LONG);
+                    TextView snackBarText = snack.getView().findViewById(android.support.design.R.id.snackbar_text);
+                    snackBarText.setTextColor(Color.WHITE);
+                    snack.getView().setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                    snack.show();
+
+                } else {
+                    pd = new ProgressDialog(SplashScreen.this);
+                    pd.setMessage("Loading...");
+                    pd.show();
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            stations.clear();
+                            for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                                stations.add(shot.getValue(Station.class));
+                            }
+
                         }
 
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                        Log.e("TAG", databaseError.getDetails());
-                    }
-                });
-
-                sensor.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        sensorDetails.clear();
-                        for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                            sensorDetails.add(shot.getValue(SensorDetails.class));
+                            Log.e("TAG", databaseError.getDetails());
                         }
-                        pd.dismiss();
+                    });
+
+                    sensor.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            sensorDetails.clear();
+                            for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                                sensorDetails.add(shot.getValue(SensorDetails.class));
+                            }
+                            pd.dismiss();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                            Log.e("TAG", databaseError.getDetails());
+                        }
+                    });
+                    pd.dismiss();
+                    if (sensorDetails.size() > 0 && stations.size() > 0) {
+                        startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    } else {
+                        Snackbar snack = Snackbar.make(enter, "Unable to fetch data. Try again.", Snackbar.LENGTH_LONG);
+                        TextView snackBarText = snack.getView().findViewById(android.support.design.R.id.snackbar_text);
+                        snackBarText.setTextColor(Color.WHITE);
+                        snack.getView().setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                        snack.show();
                     }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
 
-                        Log.e("TAG", databaseError.getDetails());
-                    }
-                });
 
-                startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                finish();
             }
         });
 
     }
 
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
 }

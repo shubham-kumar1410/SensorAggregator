@@ -1,13 +1,18 @@
 package com.bitsg.sensoraggregator;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -68,31 +73,50 @@ public class EditSensorDetails extends AppCompatActivity {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = sensorname.getText().toString();
-                String region = sensorregion.getText().toString();
-                String ub = sensorub.getText().toString();
-                String lb = sensorlb.getText().toString();
-                String type = sensortype.getText().toString();
+                if (!isNetworkAvailable(getApplicationContext())) {
 
-                SplashScreen.sensorDetails.get(index).setName(name);
-                SplashScreen.sensorDetails.get(index).setRegion(region);
-                SplashScreen.sensorDetails.get(index).setType(type);
-                SplashScreen.sensorDetails.get(index).setLb(Double.valueOf(lb));
-                SplashScreen.sensorDetails.get(index).setUb(Double.valueOf(ub));
+                    Snackbar snack = Snackbar.make(done, "No Internet.", Snackbar.LENGTH_LONG);
+                    TextView snackBarText = snack.getView().findViewById(android.support.design.R.id.snackbar_text);
+                    snackBarText.setTextColor(Color.WHITE);
+                    snack.getView().setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                    snack.show();
 
-                String key = SplashScreen.sensorDetails.get(index).getKey();
-                DatabaseReference ref = databaseReference.child(key);
+                } else {
+                    String name = sensorname.getText().toString();
+                    String region = sensorregion.getText().toString();
+                    String ub = sensorub.getText().toString();
+                    String lb = sensorlb.getText().toString();
+                    String type = sensortype.getText().toString();
+                    if (index > 0) {
+                        SplashScreen.sensorDetails.get(index).setName(name);
+                        SplashScreen.sensorDetails.get(index).setRegion(region);
+                        SplashScreen.sensorDetails.get(index).setType(type);
+                        SplashScreen.sensorDetails.get(index).setLb(Double.valueOf(lb));
+                        SplashScreen.sensorDetails.get(index).setUb(Double.valueOf(ub));
 
-                ref.child("name").setValue(name);
-                ref.child("lb").setValue(Double.valueOf(lb));
-                ref.child("ub").setValue(Double.valueOf(ub));
-                ref.child("type").setValue(type);
-                ref.child("region").setValue(region);
+                        String key = SplashScreen.sensorDetails.get(index).getKey();
+                        DatabaseReference ref = databaseReference.child(key);
 
-                finish();
+                        ref.child("name").setValue(name);
+                        ref.child("lb").setValue(Double.valueOf(lb));
+                        ref.child("ub").setValue(Double.valueOf(ub));
+                        ref.child("type").setValue(type);
+                        ref.child("region").setValue(region);
+
+                        finish();
+                    }
+
+
+                }
+
             }
         });
 
+    }
+
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 
 }

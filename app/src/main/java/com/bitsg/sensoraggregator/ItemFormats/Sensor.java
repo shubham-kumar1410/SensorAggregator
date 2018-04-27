@@ -8,14 +8,24 @@ public class Sensor {
     String data;
     String sensor_name;
     int status;
+    String id;
 
-    public Sensor(String data, String sensor_name, int status) {
+    public Sensor(String data, String sensor_name, int status, String id) {
         this.data = data;
         this.sensor_name = sensor_name;
         this.status = status;
+        this.id = id;
     }
 
     public Sensor() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getData() {

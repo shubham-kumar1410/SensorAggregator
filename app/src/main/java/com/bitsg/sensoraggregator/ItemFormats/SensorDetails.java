@@ -12,11 +12,12 @@ public class SensorDetails {
     String type;
     boolean status;
     String key;
+    String data;
 
     public SensorDetails() {
     }
 
-    public SensorDetails(String name, String region, double ub, double lb, String type, boolean status, String key) {
+    public SensorDetails(String name, String region, double ub, double lb, String type, boolean status, String key, String data) {
         this.name = name;
         this.region = region;
         this.ub = ub;
@@ -24,6 +25,15 @@ public class SensorDetails {
         this.type = type;
         this.status = status;
         this.key = key;
+        this.data = data;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public boolean getStatus() {

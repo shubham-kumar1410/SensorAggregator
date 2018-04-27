@@ -2,30 +2,36 @@ package com.bitsg.sensoraggregator;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.bitsg.sensoraggregator.ItemFormats.Sensor;
+import com.bitsg.sensoraggregator.ItemFormats.SensorDetails;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Vector;
 
 public class SensorDataActive extends AppCompatActivity {
@@ -41,7 +47,9 @@ public class SensorDataActive extends AppCompatActivity {
     CardView edit_card, normal_card;
     ProgressDialog pd;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Stations");
+    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("Sensors");
     private Vector<Sensor> sensors = new Vector<>();
+    private Vector<SensorDetails> sensorDetailsVector = new Vector<>();
     private RecyclerView recyclerView, rvcopy;
 
     @Override
@@ -71,22 +79,7 @@ public class SensorDataActive extends AppCompatActivity {
             getWindow().setNavigationBarColor(colorPrimary);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
-        try {
-            InputStream is = getAssets().open("data.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        try {
-            JSONObject obj = new JSONObject(json);
-            m_jArry = obj.getJSONArray("data");
-        } catch (Exception e) {
 
-        }
 
         index = getIntent().getIntExtra("id", -1);
         title = getIntent().getStringExtra("name");
@@ -133,7 +126,38 @@ public class SensorDataActive extends AppCompatActivity {
                                 public void run() {
                                     SharedPreferences sp = getSharedPreferences("index_value", Activity.MODE_PRIVATE);
                                     int i = sp.getInt("index", -1);
-                                    updateData(i);
+                                    sensors.clear();
+                                    dbref.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                            sensorDetailsVector.clear();
+                                            for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                                                sensorDetailsVector.add(shot.getValue(SensorDetails.class));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                            Log.e("TAG", databaseError.getDetails());
+                                        }
+                                    });
+                                    // Log.v("tag",String.valueOf(sensorDetailsVector.size()));
+                                    for (int j = 0; j < sensorDetailsVector.size(); j++) {
+                                        Sensor sensor = new Sensor();
+
+                                        sensor.setData(sensorDetailsVector.get(j).getData());
+                                        sensor.setSensor_name(sensorDetailsVector.get(j).getName());
+                                        sensor.setId(sensorDetailsVector.get(j).getKey());
+                                        double data = Double.valueOf(sensorDetailsVector.get(j).getData());
+                                        if (data > 0.5) {
+                                            sensor.setStatus(1);
+                                        } else {
+                                            sensor.setStatus(0);
+                                        }
+                                        sensors.add(sensor);
+                                    }
                                     adapter = new SensorDataAdapter(getApplicationContext(), sensors);
                                     recyclerView.setAdapter(adapter);
                                     rvcopy.setAdapter(adapter);
@@ -141,14 +165,7 @@ public class SensorDataActive extends AppCompatActivity {
                                     GridLayoutManager layoutManager1 = new GridLayoutManager(getApplicationContext(), 1);
                                     recyclerView.setLayoutManager(layoutManager);
                                     rvcopy.setLayoutManager(layoutManager1);
-                                    if (i <= 900) {
-                                        i++;
-                                    } else {
-                                        i = 0;
-                                    }
-                                    SharedPreferences.Editor editor = sp.edit();
-                                    editor.putInt("index", i);
-                                    editor.apply();
+
                                 }
                             });
                         }
@@ -177,32 +194,43 @@ public class SensorDataActive extends AppCompatActivity {
                 done.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String temp_name = name_edit.getText().toString();
-                        String temp_lat = lat_edit.getText().toString();
-                        String temp_lon = lon_edit.getText().toString();
-                        String temp_url = url_edit.getText().toString();
+                        if (!isNetworkAvailable(getApplicationContext())) {
 
-                        SplashScreen.stations.get(index).setDomain(temp_url);
-                        SplashScreen.stations.get(index).setName(temp_name);
-                        SplashScreen.stations.get(index).setLatitude(Double.valueOf(temp_lat));
-                        SplashScreen.stations.get(index).setLongitude(Double.valueOf(temp_lon));
-                        String key = SplashScreen.stations.get(index).getKey();
-                        DatabaseReference ref = databaseReference.child(key);
+                            Snackbar snack = Snackbar.make(done, "No Internet.", Snackbar.LENGTH_LONG);
+                            TextView snackBarText = snack.getView().findViewById(android.support.design.R.id.snackbar_text);
+                            snackBarText.setTextColor(Color.WHITE);
+                            snack.getView().setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                            snack.show();
 
-                        ref.child("name").setValue(temp_name);
-                        ref.child("longitude").setValue(Double.valueOf(temp_lon));
-                        ref.child("latitude").setValue(Double.valueOf(temp_lat));
-                        ref.child("domain").setValue(temp_url);
+                        } else {
+                            String temp_name = name_edit.getText().toString();
+                            String temp_lat = lat_edit.getText().toString();
+                            String temp_lon = lon_edit.getText().toString();
+                            String temp_url = url_edit.getText().toString();
+
+                            SplashScreen.stations.get(index).setDomain(temp_url);
+                            SplashScreen.stations.get(index).setName(temp_name);
+                            SplashScreen.stations.get(index).setLatitude(Double.valueOf(temp_lat));
+                            SplashScreen.stations.get(index).setLongitude(Double.valueOf(temp_lon));
+                            String key = SplashScreen.stations.get(index).getKey();
+                            DatabaseReference ref = databaseReference.child(key);
+
+                            ref.child("name").setValue(temp_name);
+                            ref.child("longitude").setValue(Double.valueOf(temp_lon));
+                            ref.child("latitude").setValue(Double.valueOf(temp_lat));
+                            ref.child("domain").setValue(temp_url);
 
 
-                        update();
+                            update();
 
-                        edit_card.setVisibility(View.INVISIBLE);
-                        normal_card.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                        rvcopy.setVisibility(View.INVISIBLE);
-                        text.setVisibility(View.VISIBLE);
-                        text_cpy.setVisibility(View.INVISIBLE);
+                            edit_card.setVisibility(View.INVISIBLE);
+                            normal_card.setVisibility(View.VISIBLE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            rvcopy.setVisibility(View.INVISIBLE);
+                            text.setVisibility(View.VISIBLE);
+                            text_cpy.setVisibility(View.INVISIBLE);
+                        }
+
                     }
                 });
 
@@ -215,40 +243,9 @@ public class SensorDataActive extends AppCompatActivity {
 
     }
 
-    private void updateData(int i) {
-        sensors.clear();
-
-        try {
-            JSONObject jo_inside = m_jArry.getJSONObject(i);
-            Sensor sensor = new Sensor();
-
-            sensor.setData(jo_inside.getString("sensor1"));
-            sensor.setSensor_name(SplashScreen.sensorDetails.get(0).getName());
-            double data = Double.valueOf(jo_inside.getString("sensor1"));
-            if (data > 0.5) {
-                sensor.setStatus(1);
-            } else {
-                sensor.setStatus(0);
-            }
-            sensors.add(sensor);
-
-            Sensor sensor1 = new Sensor();
-
-            sensor1.setData(jo_inside.getString("sensor2"));
-            sensor1.setSensor_name(SplashScreen.sensorDetails.get(1).getName());
-            data = Double.valueOf(jo_inside.getString("sensor2"));
-            if (data > 0.5) {
-                sensor1.setStatus(1);
-            } else {
-                sensor1.setStatus(0);
-            }
-            sensors.add(sensor1);
-
-
-        } catch (Exception e) {
-
-
-        }
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 
     void update() {

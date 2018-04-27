@@ -79,6 +79,7 @@ public class SensorDataAdapter extends RecyclerView.Adapter<SensorDataAdapter.Vi
                 public void onClick(View view) {
                     Intent intent = new Intent(context, GraphActivity.class);
                     intent.putExtra("id", getAdapterPosition());
+                    intent.putExtra("key", sensors.get(getAdapterPosition()).getId());
                     context.startActivity(intent);
                     Log.v("tag", String.valueOf(sensors.get(getAdapterPosition()).getStatus()));
                 }
