@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bitsg.sensoraggregator.ItemFormats.Sensor;
+import com.bitsg.sensoragg.ItemFormats.Sensor;
 
 import java.util.Vector;
 
@@ -69,6 +69,7 @@ public class SensorDataAdapter extends RecyclerView.Adapter<SensorDataAdapter.Vi
                 public void onClick(View view) {
                     Intent intent = new Intent(context, EditSensorDetails.class);
                     intent.putExtra("id", getAdapterPosition());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                     Log.v("tag", String.valueOf(sensors.get(getAdapterPosition()).getStatus()));
                 }
@@ -79,6 +80,7 @@ public class SensorDataAdapter extends RecyclerView.Adapter<SensorDataAdapter.Vi
                 public void onClick(View view) {
                     Intent intent = new Intent(context, GraphActivity.class);
                     intent.putExtra("id", getAdapterPosition());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("key", sensors.get(getAdapterPosition()).getId());
                     context.startActivity(intent);
                     Log.v("tag", String.valueOf(sensors.get(getAdapterPosition()).getStatus()));

@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -17,8 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bitsg.sensoraggregator.ItemFormats.SensorDetails;
-import com.bitsg.sensoraggregator.ItemFormats.Station;
+import com.bitsg.sensoragg.ItemFormats.Station;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,14 +28,11 @@ import java.util.Vector;
 
 public class SplashScreen extends AppCompatActivity {
 
-    public static Vector<SensorDetails> sensorDetails = new Vector<>();
     public static Vector<Station> stations = new Vector<>();
     ImageView splashimage;
     Button enter;
     ProgressDialog pd;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Stations");
-    DatabaseReference sensor = FirebaseDatabase.getInstance().getReference().child("Sensors");
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,25 +84,9 @@ public class SplashScreen extends AppCompatActivity {
                         }
                     });
 
-                    sensor.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            sensorDetails.clear();
-                            for (DataSnapshot shot : dataSnapshot.getChildren()) {
-                                sensorDetails.add(shot.getValue(SensorDetails.class));
-                            }
-                            pd.dismiss();
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                            Log.e("TAG", databaseError.getDetails());
-                        }
-                    });
                     pd.dismiss();
-                    if (sensorDetails.size() > 0 && stations.size() > 0) {
+                    if (stations.size() > 0) {
                         startActivity(new Intent(SplashScreen.this, MainActivity.class));
                     } else {
                         Snackbar snack = Snackbar.make(enter, "Unable to fetch data. Try again.", Snackbar.LENGTH_LONG);

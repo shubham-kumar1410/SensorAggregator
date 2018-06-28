@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.bitsg.sensoraggregator">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.bitsg.sensoragg">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -29,13 +30,17 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
+        <meta-data
+            android:name="android.support.VERSION"
+            android:value="27.1.1"
+            tools:replace="android:value"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.bitsg.sensoragg.MainActivity"
             android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".SplashScreen"
+            android:name="com.bitsg.sensoragg.SplashScreen"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -45,17 +50,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SensorDataActive"
+            android:name="com.bitsg.sensoragg.SensorDataActive"
             android:label="@string/title_activity_sensor_data_active"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".EditSensorDetails"
+            android:name="com.bitsg.sensoragg.EditSensorDetails"
             android:label="@string/title_activity_edit_sensor_details"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".GraphActivity"
+            android:name="com.bitsg.sensoragg.GraphActivity"
             android:label="@string/title_activity_graph"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar">

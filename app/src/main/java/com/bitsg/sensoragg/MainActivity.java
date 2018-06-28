@@ -1,5 +1,6 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitsg.sensoragg.ItemFormats.SensorDetails;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -15,13 +17,26 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Vector;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    public static Vector<SensorDetails> sensorDetails = new Vector<>();
     GoogleMap mMap;
     TextView active, inactive;
     LatLng bits, latLng;
     int inactive_number, active_number;
+    DatabaseReference sensor;
+    ProgressDialog pd;
+    Vector<SensorDetails> s = new Vector<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +48,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         active = findViewById(R.id.active_text);
         inactive = findViewById(R.id.inactive_text);
+        sensorDetails.clear();
 
         inactive_number = 0;
         active_number = 0;
@@ -83,10 +99,41 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             boolean check = SplashScreen.stations.get(i).getStatus();
             if (name.equals(title)) {
                 if (check) {
-                    Intent intent = new Intent(this, SensorDataActive.class);
+                    pd = new ProgressDialog(MainActivity.this);
+                    pd.setMessage("Loading...");
+                    pd.show();
+                    int x = 0;
+                    sensor = FirebaseDatabase.getInstance().getReference().child("Sensors").child(String.valueOf(i));
+                    final Intent intent = new Intent(getApplicationContext(), SensorDataActive.class);
                     intent.putExtra("name", name);
                     intent.putExtra("id", i);
-                    startActivity(intent);
+                    sensor.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            sensorDetails.clear();
+                            s.clear();
+                            Log.v("tagi", String.valueOf(sensorDetails.size()));
+                            for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                                sensorDetails.add(shot.getValue(SensorDetails.class));
+                                s.add(shot.getValue(SensorDetails.class));
+
+                            }
+                            Log.v("tag", String.valueOf(sensorDetails.size()));
+                            Log.v("tag2", sensorDetails.get(0).getRegion());
+
+                            startActivity(intent);
+                            pd.dismiss();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                            Log.e("TAG", databaseError.getDetails());
+                        }
+                    });
+
+
                 } else {
                     Toast.makeText(this, "Station is not Active", Toast.LENGTH_SHORT).show();
                 }

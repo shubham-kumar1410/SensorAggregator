@@ -1,8 +1,9 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -22,8 +23,8 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.bitsg.sensoraggregator.ItemFormats.Sensor;
-import com.bitsg.sensoraggregator.ItemFormats.SensorDetails;
+import com.bitsg.sensoragg.ItemFormats.Sensor;
+import com.bitsg.sensoragg.ItemFormats.SensorDetails;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,18 +37,20 @@ import java.util.Vector;
 
 public class SensorDataActive extends AppCompatActivity {
 
+    public static String stationid;
     String title;
     int index;
     SensorDataAdapter adapter;
     String json;
     JSONArray m_jArry;
-    TextView station_name, station_lat, station_lon, station_url, text, text_cpy;
-    EditText name_edit, lat_edit, lon_edit, url_edit;
+    TextView station_name, station_lat, station_lon, text, text_cpy;
+    EditText name_edit, lat_edit, lon_edit;
     FloatingActionButton edit, done;
     CardView edit_card, normal_card;
     ProgressDialog pd;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Stations");
-    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("Sensors");
+    DatabaseReference dbref;
+    Thread t = new Thread();
     private Vector<Sensor> sensors = new Vector<>();
     private Vector<SensorDetails> sensorDetailsVector = new Vector<>();
     private RecyclerView recyclerView, rvcopy;
@@ -84,7 +87,9 @@ public class SensorDataActive extends AppCompatActivity {
         index = getIntent().getIntExtra("id", -1);
         title = getIntent().getStringExtra("name");
         getSupportActionBar().setTitle(title);
-
+        stationid = String.valueOf(index);
+        // Log.v("tag",stationid);
+        dbref = FirebaseDatabase.getInstance().getReference().child("Sensors").child(stationid);
         recyclerView = findViewById(R.id.sensor_data_rv);
         rvcopy = findViewById(R.id.sensor_data_rv_copy);
 
@@ -95,12 +100,10 @@ public class SensorDataActive extends AppCompatActivity {
         station_name = findViewById(R.id.station_name);
         station_lat = findViewById(R.id.station_lat);
         station_lon = findViewById(R.id.station_lon);
-        station_url = findViewById(R.id.ip_localhost);
 
         name_edit = findViewById(R.id.station_name_edit);
         lat_edit = findViewById(R.id.station_lat_edit);
         lon_edit = findViewById(R.id.station_lon_edit);
-        url_edit = findViewById(R.id.ip_localhost_edit);
 
         normal_card = findViewById(R.id.station_card);
         edit_card = findViewById(R.id.station_card_edit);
@@ -113,7 +116,8 @@ public class SensorDataActive extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         rvcopy.setHasFixedSize(true);
 
-        Thread t = new Thread() {
+
+        t = new Thread() {
 
             @Override
             public void run() {
@@ -145,18 +149,29 @@ public class SensorDataActive extends AppCompatActivity {
                                     });
                                     // Log.v("tag",String.valueOf(sensorDetailsVector.size()));
                                     for (int j = 0; j < sensorDetailsVector.size(); j++) {
-                                        Sensor sensor = new Sensor();
-
-                                        sensor.setData(sensorDetailsVector.get(j).getData());
-                                        sensor.setSensor_name(sensorDetailsVector.get(j).getName());
-                                        sensor.setId(sensorDetailsVector.get(j).getKey());
-                                        double data = Double.valueOf(sensorDetailsVector.get(j).getData());
-                                        if (data > 0.5) {
-                                            sensor.setStatus(1);
+                                        SensorDetails sensorDetails = sensorDetailsVector.get(j);
+                                        if (sensorDetails.getName().equals("") || sensorDetails.getRegion().equals("") || sensorDetails.getType().equals("")) {
+                                            Intent intent = new Intent(getApplicationContext(), EditSensorDetails.class);
+                                            intent.putExtra("id", j);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            getApplication().startActivity(intent);
+                                            finish();
+                                            interrupt();
                                         } else {
-                                            sensor.setStatus(0);
+                                            Sensor sensor = new Sensor();
+
+                                            sensor.setData(sensorDetailsVector.get(j).getData());
+                                            sensor.setSensor_name(sensorDetailsVector.get(j).getName());
+                                            sensor.setId(sensorDetailsVector.get(j).getKey());
+                                            double data = Double.valueOf(sensorDetailsVector.get(j).getData());
+                                            if (data > 0.5) {
+                                                sensor.setStatus(1);
+                                            } else {
+                                                sensor.setStatus(0);
+                                            }
+                                            sensors.add(sensor);
                                         }
-                                        sensors.add(sensor);
+
                                     }
                                     adapter = new SensorDataAdapter(getApplicationContext(), sensors);
                                     recyclerView.setAdapter(adapter);
@@ -206,9 +221,7 @@ public class SensorDataActive extends AppCompatActivity {
                             String temp_name = name_edit.getText().toString();
                             String temp_lat = lat_edit.getText().toString();
                             String temp_lon = lon_edit.getText().toString();
-                            String temp_url = url_edit.getText().toString();
 
-                            SplashScreen.stations.get(index).setDomain(temp_url);
                             SplashScreen.stations.get(index).setName(temp_name);
                             SplashScreen.stations.get(index).setLatitude(Double.valueOf(temp_lat));
                             SplashScreen.stations.get(index).setLongitude(Double.valueOf(temp_lon));
@@ -218,7 +231,6 @@ public class SensorDataActive extends AppCompatActivity {
                             ref.child("name").setValue(temp_name);
                             ref.child("longitude").setValue(Double.valueOf(temp_lon));
                             ref.child("latitude").setValue(Double.valueOf(temp_lat));
-                            ref.child("domain").setValue(temp_url);
 
 
                             update();
@@ -252,12 +264,22 @@ public class SensorDataActive extends AppCompatActivity {
         station_name.setText(SplashScreen.stations.get(index).getName());
         station_lat.setText(String.valueOf(SplashScreen.stations.get(index).getLatitude()));
         station_lon.setText(String.valueOf(SplashScreen.stations.get(index).getLongitude()));
-        station_url.setText(SplashScreen.stations.get(index).getDomain());
 
         name_edit.setText(SplashScreen.stations.get(index).getName());
         lat_edit.setText(String.valueOf(SplashScreen.stations.get(index).getLatitude()));
         lon_edit.setText(String.valueOf(SplashScreen.stations.get(index).getLongitude()));
-        url_edit.setText(SplashScreen.stations.get(index).getDomain());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        t.interrupt();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        t.interrupt();
     }
 
     public interface ClickListener {

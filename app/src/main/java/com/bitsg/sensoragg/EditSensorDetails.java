@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -23,7 +23,7 @@ public class EditSensorDetails extends AppCompatActivity {
     android.support.design.widget.TextInputEditText sensorregion;
     android.support.design.widget.TextInputEditText sensorub;
     android.support.design.widget.TextInputEditText sensorlb;
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Sensors");
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Sensors").child(SensorDataActive.stationid);
     Button done;
     int index;
 
@@ -63,11 +63,11 @@ public class EditSensorDetails extends AppCompatActivity {
 
         index = getIntent().getIntExtra("id", -1);
         if (index >= 0) {
-            sensorname.setText(SplashScreen.sensorDetails.get(index).getName());
-            sensorregion.setText(SplashScreen.sensorDetails.get(index).getRegion());
-            sensorub.setText(String.valueOf(SplashScreen.sensorDetails.get(index).getUb()));
-            sensorlb.setText(String.valueOf(SplashScreen.sensorDetails.get(index).getLb()));
-            sensortype.setText(SplashScreen.sensorDetails.get(index).getType());
+            sensorname.setText(MainActivity.sensorDetails.get(index).getName());
+            sensorregion.setText(MainActivity.sensorDetails.get(index).getRegion());
+            sensorub.setText(String.valueOf(MainActivity.sensorDetails.get(index).getUb()));
+            sensorlb.setText(String.valueOf(MainActivity.sensorDetails.get(index).getLb()));
+            sensortype.setText(MainActivity.sensorDetails.get(index).getType());
         }
 
         done.setOnClickListener(new View.OnClickListener() {
@@ -87,14 +87,14 @@ public class EditSensorDetails extends AppCompatActivity {
                     String ub = sensorub.getText().toString();
                     String lb = sensorlb.getText().toString();
                     String type = sensortype.getText().toString();
-                    if (index > 0) {
-                        SplashScreen.sensorDetails.get(index).setName(name);
-                        SplashScreen.sensorDetails.get(index).setRegion(region);
-                        SplashScreen.sensorDetails.get(index).setType(type);
-                        SplashScreen.sensorDetails.get(index).setLb(Double.valueOf(lb));
-                        SplashScreen.sensorDetails.get(index).setUb(Double.valueOf(ub));
+                    if (index >= 0) {
+                        MainActivity.sensorDetails.get(index).setName(name);
+                        MainActivity.sensorDetails.get(index).setRegion(region);
+                        MainActivity.sensorDetails.get(index).setType(type);
+                        MainActivity.sensorDetails.get(index).setLb(Double.valueOf(lb));
+                        MainActivity.sensorDetails.get(index).setUb(Double.valueOf(ub));
 
-                        String key = SplashScreen.sensorDetails.get(index).getKey();
+                        String key = MainActivity.sensorDetails.get(index).getKey();
                         DatabaseReference ref = databaseReference.child(key);
 
                         ref.child("name").setValue(name);
@@ -102,6 +102,7 @@ public class EditSensorDetails extends AppCompatActivity {
                         ref.child("ub").setValue(Double.valueOf(ub));
                         ref.child("type").setValue(type);
                         ref.child("region").setValue(region);
+
 
                         finish();
                     }

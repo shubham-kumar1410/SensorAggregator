@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bitsg.sensoraggregator.ItemFormats.Sensor;
+import com.bitsg.sensoragg.ItemFormats.Sensor;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;

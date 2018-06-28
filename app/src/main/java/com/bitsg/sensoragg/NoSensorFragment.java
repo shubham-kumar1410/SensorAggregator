@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;

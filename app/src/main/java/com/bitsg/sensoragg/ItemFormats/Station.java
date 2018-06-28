@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator.ItemFormats;
+package com.bitsg.sensoragg.ItemFormats;
 
 /**
  * Created by shubhamk on 18/4/18.

@@ -1,4 +1,4 @@
-package com.bitsg.sensoraggregator;
+package com.bitsg.sensoragg;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -10,11 +10,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.bitsg.sensoraggregator.ItemFormats.LogData;
+import com.bitsg.sensoragg.ItemFormats.LogData;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -33,9 +34,12 @@ public class GraphActivity extends AppCompatActivity {
     String json;
     JSONArray m_jArry;
     String sensor_key;
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("log");
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("log").child(SensorDataActive.stationid);
     Vector<LogData> logData = new Vector<>();
+    Vector<LogData> logDatafinal = new Vector<>();
     Vector<String> key = new Vector<>();
+    Thread t1 = new Thread();
+    Query query = databaseReference.limitToLast(300);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,26 +69,25 @@ public class GraphActivity extends AppCompatActivity {
         index = getIntent().getIntExtra("id", -1);
         sensor_key = getIntent().getStringExtra("key");
         if (index >= 0) {
-            getSupportActionBar().setTitle(SplashScreen.sensorDetails.get(index).getName());
+            getSupportActionBar().setTitle(MainActivity.sensorDetails.get(index).getName());
         }
 
-        Thread t = new Thread() {
+        t1 = new Thread() {
 
             @Override
             public void run() {
                 try {
                     while (!isInterrupted()) {
-                        Thread.sleep(500);
+                        Thread.sleep(5000);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
 
 
-
                                 graph.removeAllSeries();
 
                                 BarGraphSeries<DataPoint> series = new BarGraphSeries<>();
-                                databaseReference.addValueEventListener(new ValueEventListener() {
+                                query.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -102,18 +105,33 @@ public class GraphActivity extends AppCompatActivity {
                                         Log.e("TAG", databaseError.getDetails());
                                     }
                                 });
+                                logDatafinal.clear();
                                 for (int k = 0; k < logData.size(); k++) {
                                     if (logData.get(k).getSensorID().equals(sensor_key)) {
-                                        DataPoint dataPoint = new DataPoint(k, Float.parseFloat(logData.get(k).getData()));
+                                        logDatafinal.add(logData.get(k));
+                                    }
+                                }
+                                int log_size = logDatafinal.size();
+                                if (log_size > 100) {
+                                    int k = 0;
+                                    for (int u = log_size - 100; u < log_size; u++) {
+
+                                        DataPoint dataPoint = new DataPoint(k, Float.parseFloat(logDatafinal.get(u).getData()));
+                                        series.appendData(dataPoint, true, 100);
+                                        k++;
+                                    }
+                                } else {
+                                    for (int u = 0; u < log_size; u++) {
+                                        DataPoint dataPoint = new DataPoint(u, Float.parseFloat(logDatafinal.get(u).getData()));
                                         series.appendData(dataPoint, true, 100);
                                     }
                                 }
-
                                 graph.addSeries(series);
                                 series.setSpacing(5);
 
                                 series.setDrawValuesOnTop(true);
-                                graph.setTitle(SplashScreen.sensorDetails.get(index).getName());
+                                Log.v("in", String.valueOf(MainActivity.sensorDetails.size()));
+                                graph.setTitle(MainActivity.sensorDetails.get(index).getName());
                                 graph.getViewport().setScrollable(true); // enables horizontal scrolling
                                 graph.getViewport().setScrollableY(true); // enables vertical scrolling
                                 graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
@@ -139,9 +157,21 @@ public class GraphActivity extends AppCompatActivity {
             }
         };
 
-        t.start();
+        t1.start();
 
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        t1.interrupt();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        t1.interrupt();
     }
 
 }
